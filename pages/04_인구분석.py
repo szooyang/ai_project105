@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib import font_manager, rc
 import platform
 
 # -----------------------------
@@ -21,15 +20,14 @@ plt.rcParams["axes.unicode_minus"] = False
 # -----------------------------
 # 데이터 불러오기
 # -----------------------------
-df = pd.read_csv("population.csv", encoding="utf-8")
+df = pd.read_csv("population.csv", encoding="cp949")
 
 # -----------------------------
 # 데이터 전처리
 # -----------------------------
-# 행정구 이름 컬럼
 district_col = df.columns[0]
 
-# 전체 서울 제외
+# 서울특별시 제외
 df = df[df[district_col] != "서울특별시"]
 
 # 숫자형 변환
@@ -41,17 +39,22 @@ for col in df.columns[1:]:
         .astype(float)
     )
 
-# 연령 컬럼 추출
+# 연령 컬럼
 age_columns = df.columns[2:]
 
 # -----------------------------
-# Streamlit UI
+# Streamlit 설정
 # -----------------------------
-st.set_page_config(page_title="서울시 행정구별 인구수", layout="centered")
+st.set_page_config(
+    page_title="서울시 행정구별 인구수",
+    layout="centered"
+)
 
 st.title("서울시 행정구별 인구수")
 
+# -----------------------------
 # 행정구 선택
+# -----------------------------
 districts = df[district_col].tolist()
 
 selected_district = st.selectbox(
@@ -59,17 +62,19 @@ selected_district = st.selectbox(
     districts
 )
 
-# 선택 데이터
 selected_data = df[df[district_col] == selected_district]
 
 # 연령별 인구수
 population_values = selected_data.iloc[0, 2:].values
 
-# 나이 라벨
-age_labels = [col.replace("계_", "").replace("세", "") for col in age_columns]
+# 나이 라벨 정리
+age_labels = [
+    col.replace("계_", "").replace("세", "")
+    for col in age_columns
+]
 
 # -----------------------------
-# 그래프 그리기
+# 그래프
 # -----------------------------
 fig, ax = plt.subplots(figsize=(14, 6))
 
@@ -94,20 +99,20 @@ ax.set_title(
 )
 
 # 축 제목
-ax.set_xlabel("나이", fontsize=13)
-ax.set_ylabel("인구수", fontsize=13)
+ax.set_xlabel("나이")
+ax.set_ylabel("인구수")
 
-# x축 라벨 회전
+# x축 회전
 plt.xticks(rotation=45)
 
 # 격자
 ax.grid(True, linestyle="--", alpha=0.5)
 
-# Streamlit 출력
+# 출력
 st.pyplot(fig)
 
 # -----------------------------
-# 데이터 표 출력
+# 데이터 표
 # -----------------------------
 st.subheader(f"{selected_district} 연령별 인구 데이터")
 
