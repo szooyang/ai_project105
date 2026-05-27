@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 # -------------------------------------------------
 # 페이지 설정
@@ -22,7 +22,7 @@ df = pd.read_csv("population.csv", encoding="cp949")
 # -------------------------------------------------
 district_col = df.columns[0]
 
-# 서울특별시 전체 제외
+# 서울특별시 제외
 df = df[df[district_col] != "서울특별시"]
 
 # -------------------------------------------------
@@ -60,7 +60,6 @@ selected_district = st.selectbox(
 # -------------------------------------------------
 selected_data = df[df[district_col] == selected_district]
 
-# 연령별 인구수
 population_values = selected_data[age_columns].iloc[0].values
 
 # -------------------------------------------------
@@ -77,35 +76,36 @@ for col in age_columns:
     age_labels.append(label)
 
 # -------------------------------------------------
-# 그래프 생성
+# Plotly 그래프
 # -------------------------------------------------
-fig, ax = plt.subplots(figsize=(16, 7))
+fig = go.Figure()
 
-# 회색 배경
-fig.patch.set_facecolor("#d9d9d9")
-ax.set_facecolor("#d9d9d9")
-
-# 빨간색 꺾은선 그래프
-ax.plot(
-    age_labels,
-    population_values,
-    color="red",
-    linewidth=2.5,
-    marker="o"
+fig.add_trace(
+    go.Scatter(
+        x=age_labels,
+        y=population_values,
+        mode="lines+markers",
+        line=dict(color="red", width=3),
+        marker=dict(size=7),
+        hovertemplate=
+        "<b>Age:</b> %{x}<br>" +
+        "<b>Population:</b> %{y:,}<extra></extra>"
+    )
 )
 
-# 축 이름
-ax.set_xlabel("age", fontsize=14)
-ax.set_ylabel("population", fontsize=14)
+# 배경색 회색
+fig.update_layout(
+    paper_bgcolor="#d9d9d9",
+    plot_bgcolor="#d9d9d9",
 
-# x축 회전
-plt.xticks(rotation=45)
+    xaxis_title="age",
+    yaxis_title="population",
 
-# 격자
-ax.grid(True, linestyle="--", alpha=0.5)
+    height=650
+)
 
-# Streamlit 출력
-st.pyplot(fig)
+# 출력
+st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------------------------------
 # 데이터 테이블
