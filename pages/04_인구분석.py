@@ -1,31 +1,14 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import platform
-
-# -------------------------------------------------
-# 한글 폰트 설정
-# -------------------------------------------------
-system_name = platform.system()
-
-if system_name == "Windows":
-    plt.rc("font", family="Malgun Gothic")
-elif system_name == "Darwin":
-    plt.rc("font", family="AppleGothic")
-else:
-    plt.rcParams["font.family"] = "NanumGothic"
-
-plt.rcParams["axes.unicode_minus"] = False
 
 # -------------------------------------------------
 # Streamlit 기본 설정
 # -------------------------------------------------
 st.set_page_config(
-    page_title="서울시 행정구별 인구수",
+    page_title="Population Analysis",
     layout="wide"
 )
-
-st.title("서울시 행정구별 인구수")
 
 # -------------------------------------------------
 # CSV 파일 불러오기
@@ -33,7 +16,7 @@ st.title("서울시 행정구별 인구수")
 df = pd.read_csv("population.csv", encoding="cp949")
 
 # -------------------------------------------------
-# 컬럼 확인
+# 행정구 컬럼
 # -------------------------------------------------
 district_col = df.columns[0]
 
@@ -66,12 +49,12 @@ for col in age_columns:
 districts = df[district_col].tolist()
 
 selected_district = st.selectbox(
-    "행정구를 선택하세요",
+    "Select District",
     districts
 )
 
 # -------------------------------------------------
-# 선택된 데이터
+# 선택 데이터
 # -------------------------------------------------
 selected_data = df[df[district_col] == selected_district]
 
@@ -107,16 +90,9 @@ ax.plot(
     marker="o"
 )
 
-# 제목
-ax.set_title(
-    "서울시 행정구별 인구수",
-    fontsize=20,
-    fontweight="bold"
-)
-
-# 축 제목
-ax.set_xlabel("나이", fontsize=14)
-ax.set_ylabel("인구수", fontsize=14)
+# 축 이름
+ax.set_xlabel("age", fontsize=14)
+ax.set_ylabel("population", fontsize=14)
 
 # x축 글자 회전
 plt.xticks(rotation=45)
@@ -124,17 +100,15 @@ plt.xticks(rotation=45)
 # 격자
 ax.grid(True, linestyle="--", alpha=0.5)
 
-# Streamlit 출력
+# 출력
 st.pyplot(fig)
 
 # -------------------------------------------------
 # 데이터 테이블
 # -------------------------------------------------
-st.subheader(f"{selected_district} 연령별 인구 데이터")
-
 chart_df = pd.DataFrame({
-    "나이": age_labels,
-    "인구수": population_values
+    "age": age_labels,
+    "population": population_values
 })
 
 st.dataframe(chart_df, use_container_width=True)
