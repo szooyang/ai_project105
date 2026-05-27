@@ -3,12 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # -------------------------------------------------
-# Streamlit 기본 설정
+# 페이지 설정
 # -------------------------------------------------
 st.set_page_config(
-    page_title="Population Analysis",
+    page_title="행정구별 인구수",
     layout="wide"
 )
+
+st.title("행정구별 인구수")
 
 # -------------------------------------------------
 # CSV 파일 불러오기
@@ -61,7 +63,9 @@ selected_data = df[df[district_col] == selected_district]
 # 연령별 인구수
 population_values = selected_data[age_columns].iloc[0].values
 
+# -------------------------------------------------
 # 나이 라벨 정리
+# -------------------------------------------------
 age_labels = []
 
 for col in age_columns:
@@ -94,13 +98,13 @@ ax.plot(
 ax.set_xlabel("age", fontsize=14)
 ax.set_ylabel("population", fontsize=14)
 
-# x축 글자 회전
+# x축 회전
 plt.xticks(rotation=45)
 
 # 격자
 ax.grid(True, linestyle="--", alpha=0.5)
 
-# 출력
+# Streamlit 출력
 st.pyplot(fig)
 
 # -------------------------------------------------
